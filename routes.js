@@ -167,6 +167,30 @@ routes.post('/api/users', md.checkName, (req, res, next) => {
         })
 })
 
+routes.put('/api/users/:id', md.checkName, (req, res, next) => {
+    const { id } = req.params;
+    const name = req.query.name;
+
+    users.update(id, { name })
+        .then(updated => {
+            updated
+            ? users.getById(id)
+                .then(user => {
+                    res.json(user);
+                })
+            : next({
+                status: 400,
+                message: "the user with that id doesn't exists"
+            })
+        })
+        .catch(err => {
+            next({
+                status: 500,
+                message: "The user could not be updated"
+            })
+        })
+})
+
 routes.use(err.error);
 
 module.exports = routes;
