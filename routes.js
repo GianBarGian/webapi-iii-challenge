@@ -41,6 +41,61 @@ routes.get('/api/posts/:id', (req, res, next) => {
         });
 })
 
+routes.delete('/api/posts/:id', (req, res, next) => {
+    const { id } = req.params;
+    posts.remove(id)
+        .then(removed => {
+            removed
+            ? posts.get()
+                .then(posts => {
+                    res.json(posts);
+                })
+            : next({
+                status: 404,
+                message: "The post with the specified ID does not exist." 
+            })
+        })
+        .catch(err => {
+            next({
+                status: 500,
+                message: "The post could not be removed." 
+            })
+        });
+})
+
+routes.post('/api/posts/:userId', (req, res, next) => {
+    const { userId } = req.params;
+    const newPost = {
+        text: req.body.text,
+        user_Id: userId,
+    }
+
+    newPost.text
+    ?   users.getById(userId)
+        .then(user => {
+            user
+            ? posts.insert(newPost)
+            .then(post => {
+                res.json(post)
+            })
+            .catch(err => {
+                next({
+                    status: 500,
+                    message: "The post could not be posted." 
+                })
+            })
+            : next({
+                status: 404,
+                message: "The user with the specified ID does not exist." 
+            }) 
+        })
+        
+    : next({
+        status: 400,
+        message: "Provide a text for the post" 
+    })
+})
+
 // USERS REQUESTS
 
 routes.get('/api/users', (req, res, next) => {
@@ -71,6 +126,28 @@ routes.get('/api/users/:id', (req, res, next) => {
             next({
                 status: 500,
                 message: "The user information could not be retrieved." 
+            })
+        });
+})
+
+routes.delete('/api/users/:id', (req, res, next) => {
+    const { id } = req.params;
+    users.remove(id)
+        .then(removed => {
+            removed
+            ? users.get()
+                .then(users => {
+                    res.json(users);
+                })
+            : next({
+                status: 404,
+                message: "The user with the specified ID does not exist." 
+            })
+        })
+        .catch(err => {
+            next({
+                status: 500,
+                message: "The user could not be removed." 
             })
         });
 })
