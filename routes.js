@@ -152,6 +152,21 @@ routes.delete('/api/users/:id', (req, res, next) => {
         });
 })
 
+routes.post('/api/users', md.checkName, (req, res, next) => {
+    const name = req.query.name;
+
+    users.insert({ name })
+        .then(user => {
+            res.json(user);
+        })
+        .catch(err => {
+            next({
+                status: 500,
+                message: "The user could not be posted." 
+            })
+        })
+})
+
 routes.use(err.error);
 
 module.exports = routes;

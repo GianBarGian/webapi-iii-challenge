@@ -5,7 +5,7 @@ function checkName(req, res, next) {
     ? next()
     : next({
         status: 500,
-        message: "I need a name",
+        message: "I need a name as a query string",
     })
 }
 
